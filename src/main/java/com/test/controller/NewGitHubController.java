@@ -1,26 +1,25 @@
 package com.test.controller;
 
 import com.test.dto.GithubLoginRequest;
+import com.test.model.GitHubUser;
 import com.test.service.NewGitHubService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/github")
 public class NewGitHubController {
 
-    private final NewGitHubService gitHubService;
+    @Autowired
+    private NewGitHubService gitHubService;
 
-    public NewGitHubController(NewGitHubService gitHubService) {
-        this.gitHubService = gitHubService;
-    }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginToGithub(@RequestBody GithubLoginRequest request) {
+        GitHubUser user = gitHubService.authenticateWithToken(request.getToken());
 
-    @PostMapping("/github/login")
-    public ResponseEntity<String> loginToGithub(@RequestBody GithubLoginRequest request) {
-        boolean success = gitHubService.authenticateWithToken(request.getToken());
-
-        if (success) {
-            return ResponseEntity.ok("Authentication successful");
+        if (user != null) {
+            return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
         }
