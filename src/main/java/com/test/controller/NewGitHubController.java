@@ -15,7 +15,7 @@ public class NewGitHubController {
         this.gitHubService = gitHubService;
     }
 
-    @PostMapping("/github/login")
+    @PostMapping("/login")
     public ResponseEntity<String> loginToGithub(@RequestBody GithubLoginRequest request) {
         boolean success = gitHubService.authenticateWithToken(request.getToken());
 
