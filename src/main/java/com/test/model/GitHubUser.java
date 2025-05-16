@@ -11,8 +11,12 @@ public class GitHubUser {
     @JsonProperty("repos_url")
     private String reposUrl;
 
+    @JsonProperty("private")
+    private boolean isPrivate; // checking for the public or private repository
+
     private String type;
     private String name;
+
 
     // Getters and Setters
 
@@ -62,5 +66,13 @@ public class GitHubUser {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }
