@@ -1,8 +1,7 @@
 package com.test.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-        import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -10,28 +9,28 @@ import java.util.Collections;
 @Service
 public class NewGitHubService {
 
-    @Value("${github.api.url}")
-    private String githubApiUrl;
+    public boolean authenticateWithToken(String token) {
+        String url = "https://api.github.com/user";
 
-    @Value("${github.token}")
-    private String githubToken;
-
-    public String getGitHubUserInfo() {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "token " + githubToken);
+        headers.setBearerAuth(token);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                githubApiUrl,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
 
-        return response.getBody();
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

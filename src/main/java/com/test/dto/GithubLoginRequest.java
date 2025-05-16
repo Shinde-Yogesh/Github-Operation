@@ -1,10 +1,9 @@
 package com.test.dto;
 
-
 public class GithubLoginRequest {
-    private String token;  // instead of username/password
+    private String token;
 
-    // Getters and setters
+    // Getters and Setters
     public String getToken() {
         return token;
     }
@@ -13,3 +12,4 @@ public class GithubLoginRequest {
         this.token = token;
     }
 }
+
