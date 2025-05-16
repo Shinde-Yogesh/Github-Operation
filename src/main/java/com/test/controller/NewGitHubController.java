@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/github")
@@ -40,4 +41,37 @@ public class NewGitHubController {
 
         return ResponseEntity.ok(repos);
     }
+
+//    @PostMapping("/repo-structure")
+//    public ResponseEntity<?> getRepoStructure(@RequestBody Map<String, String> request) {
+//        String token = request.get("token");
+//        String owner = request.get("owner");
+//        String repo = request.get("repo");
+//
+//        Map<String, Object> structure = gitHubService.getRepositoryStructure(token, owner, repo);
+//
+//        if (structure == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Repository structure not found or invalid inputs.");
+//        }
+//
+//        return ResponseEntity.ok(structure);
+//    }
+
+
+    @PostMapping("/repo-paths")
+    public ResponseEntity<?> getRepoPaths(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String owner = request.get("owner");
+        String repo = request.get("repo");
+
+        List<String> paths = gitHubService.getRepositoryFilePaths(token, owner, repo);
+
+        if (paths == null || paths.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No files found or error fetching repository.");
+        }
+
+        return ResponseEntity.ok(paths);
+    }
+
+
 }
