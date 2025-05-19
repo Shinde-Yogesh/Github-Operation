@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.Base64;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class NewGitHubService {
@@ -182,6 +182,38 @@ public class NewGitHubService {
             }
 
             return paths;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //for getting the file content
+
+    public String getFileContent(String token, String owner, String repo, String path) {
+        try {
+            String contentUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.exchange(contentUrl, HttpMethod.GET, entity, Map.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) return null;
+
+            String encodedContent = (String) response.getBody().get("content");
+            String encoding = (String) response.getBody().get("encoding");
+
+            if ("base64".equalsIgnoreCase(encoding) && encodedContent != null) {
+                // GitHub may include newline characters, remove them
+                encodedContent = encodedContent.replaceAll("\\s", "");
+                byte[] decodedBytes = Base64.getDecoder().decode(encodedContent);
+                return new String(decodedBytes);
+            }
+
+            return null;
         } catch (Exception e) {
             return null;
         }

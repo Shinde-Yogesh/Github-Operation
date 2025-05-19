@@ -57,7 +57,7 @@ public class NewGitHubController {
 //        return ResponseEntity.ok(structure);
 //    }
 
-
+    //getting the actual path
     @PostMapping("/repo-paths")
     public ResponseEntity<?> getRepoPaths(@RequestBody Map<String, String> request) {
         String token = request.get("token");
@@ -73,5 +73,25 @@ public class NewGitHubController {
         return ResponseEntity.ok(paths);
     }
 
+    //For getting the file Content
+    @PostMapping("/repo-file")
+    public ResponseEntity<?> getFileContent(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String owner = request.get("owner");
+        String repo = request.get("repo");
+        String path = request.get("path");
+
+        if (path == null || path.isEmpty()) {
+            return ResponseEntity.badRequest().body("File path is required.");
+        }
+
+        String content = gitHubService.getFileContent(token, owner, repo, path);
+
+        if (content == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found or cannot be read.");
+        }
+
+        return ResponseEntity.ok(content);
+    }
 
 }
