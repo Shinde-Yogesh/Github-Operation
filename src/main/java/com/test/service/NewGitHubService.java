@@ -215,7 +215,83 @@ public class NewGitHubService {
 
             return null;
         } catch (Exception e) {
+            logger.error("An error occurred: {}", e.getMessage(), e);
             return null;
+        }
+    }
+
+    //for getting the actual return type of data
+    public byte[] getFileAsBytes(String token, String owner, String repo, String path) {
+        try {
+            String url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) return null;
+
+            //checking the response
+            System.out.println("Here is the Response :- ");
+            System.out.println(response);
+
+            String encodedContent = (String) response.getBody().get("content");
+            String encoding = (String) response.getBody().get("encoding");
+
+            if ("base64".equalsIgnoreCase(encoding)) {
+                encodedContent = encodedContent.replaceAll("\\s", "");
+                return Base64.getDecoder().decode(encodedContent);
+            }
+
+            return null;
+        } catch (Exception e) {
+            logger.error("An error occurred: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public String detectContentType(String path) {
+        if (path.endsWith(".java")) return "text/x-java-source";
+        if (path.endsWith(".properties")) return "text/plain";
+        if (path.endsWith(".txt")) return "text/plain";
+        if (path.endsWith(".json")) return "application/json";
+        if (path.endsWith(".xml")) return "application/xml";
+        if (path.endsWith(".html")) return "text/html";
+        if (path.endsWith(".png")) return "image/png";
+        if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+        if (path.endsWith(".pdf")) return "application/pdf";
+        return "application/octet-stream"; // default
+    }
+
+    //for getting the list of issue
+    public List<Map<String, Object>> getRepoIssues(String token, String owner, String repo) {
+        try {
+            String url = "https://api.github.com/repos/" + owner + "/" + repo + "/issues";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<List> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    List.class
+            );
+
+            if (!response.getStatusCode().is2xxSuccessful()) return Collections.emptyList();
+
+            return response.getBody();
+        } catch (Exception e) {
+            return Collections.emptyList();
         }
     }
 
