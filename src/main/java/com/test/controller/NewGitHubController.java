@@ -113,8 +113,8 @@ public class NewGitHubController {
             String contentType = gitHubService.detectContentType(path);
 
             //checking the content type
-            System.out.println("Here is the Content Type :- ");
-            System.out.println(contentType);
+//            System.out.println("Here is the Content Type :- ");
+//            System.out.println(contentType);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
