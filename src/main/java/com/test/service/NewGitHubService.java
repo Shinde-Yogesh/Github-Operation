@@ -296,4 +296,38 @@ public class NewGitHubService {
     }
 
 
+    //for the signle github issue
+
+    public Map<String, Object> getSingleIssue(String token, String owner, String repo, String issueNumber) {
+        try {
+            String url = "https://api.github.com/repos/" + owner + "/" + repo + "/issues/" + issueNumber;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            if (!response.getStatusCode().is2xxSuccessful()) return null;
+
+            Map<String, Object> issue = response.getBody();
+
+            // Remove if it's a pull request (optional)
+            if (issue.containsKey("pull_request")) return null;
+
+            // Enrich with comments
+            String commentsUrl = url + "/comments";
+            ResponseEntity<List> commentResponse = restTemplate.exchange(commentsUrl, HttpMethod.GET, entity, List.class);
+            issue.put("comments", commentResponse.getStatusCode().is2xxSuccessful() ? commentResponse.getBody() : Collections.emptyList());
+
+            return issue;
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
 }

@@ -143,4 +143,22 @@ public class NewGitHubController {
     }
 
 
+    //for getting the single issue
+
+    @PostMapping("/github/issues/single")
+    public ResponseEntity<?> getSingleIssue(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String owner = request.get("owner");
+        String repo = request.get("repo");
+        String issueNumber = request.get("issue_number");
+
+        if (token == null || owner == null || repo == null || issueNumber == null) {
+            return ResponseEntity.badRequest().body("Token, owner, repo, and issue_number are required.");
+        }
+
+        Map<String, Object> issue = gitHubService.getSingleIssue(token, owner, repo, issueNumber);
+        return issue != null ? ResponseEntity.ok(issue) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Issue not found.");
+    }
+
+
 }
