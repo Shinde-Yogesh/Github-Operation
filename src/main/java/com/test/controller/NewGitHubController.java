@@ -145,7 +145,7 @@ public class NewGitHubController {
 
     //for getting the single issue
 
-    @PostMapping("/github/issues/single")
+    @PostMapping("/issues/single")
     public ResponseEntity<?> getSingleIssue(@RequestBody Map<String, String> request) {
         String token = request.get("token");
         String owner = request.get("owner");
