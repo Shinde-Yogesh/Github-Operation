@@ -160,5 +160,23 @@ public class NewGitHubController {
         return issue != null ? ResponseEntity.ok(issue) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Issue not found.");
     }
 
+    // Push on the github file
+    @PostMapping("/push-file")
+    public ResponseEntity<?> pushFile(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String owner = request.get("owner");
+        String repo = request.get("repo");
+        String path = request.get("path"); // full local file path
+        String message = request.get("message");
+
+        try {
+            gitHubService.pushFileToGitHub(token, owner, repo, path, message);
+            return ResponseEntity.ok("File pushed to GitHub.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed: " + e.getMessage());
+        }
+    }
+
+
 
 }
